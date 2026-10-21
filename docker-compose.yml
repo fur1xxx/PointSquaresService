@@ -1,0 +1,26 @@
+services:
+  point-squares-service:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings__PointSquares=Server=point-squares-mysql;Port=3306;Database=point_squares;User ID=root;Password=toor
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: curl -f http://localhost:8080/point-squares/v1/health-check
+      interval: 2s
+      retries: 10
+    depends_on:
+      point-squares-mysql:
+        condition: service_healthy
+  point-squares-mysql:
+    image: mysql:8.4.3
+    environment:
+      MYSQL_DATABASE: point_squares
+      MYSQL_ROOT_PASSWORD: "toor"
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -uroot -ptoor --silent
+      interval: 2s
+      retries: 30

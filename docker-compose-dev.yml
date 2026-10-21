@@ -1,0 +1,12 @@
+services:
+  mysql:
+    image: mysql:8.4.3
+    environment:
+      MYSQL_DATABASE: point_squares
+      MYSQL_ROOT_PASSWORD: "toor"
+    ports:
+      - "3368:3306"
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -uroot -ptoor --silent
+      interval: 2s
+      retries: 30
