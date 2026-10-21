@@ -6,6 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="MySql.EntityFrameworkCore" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Domain.Core\Domain.Core.csproj" />
     </ItemGroup>
 </Project>

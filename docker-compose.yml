@@ -13,6 +13,17 @@ services:
       interval: 2s
       retries: 10
     depends_on:
+      point-squares-migrator:
+        condition: service_completed_successfully
+  point-squares-migrator:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: migrator
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings__PointSquares=Server=point-squares-mysql;Port=3306;Database=point_squares;User ID=root;Password=toor
+    depends_on:
       point-squares-mysql:
         condition: service_healthy
   point-squares-mysql:

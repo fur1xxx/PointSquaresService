@@ -18,13 +18,13 @@ public partial class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : 
         };
 
         if (statusCode >= StatusCodes.Status500InternalServerError)
-            LogUnhandledException(logger, exception);
+            LogUnhandledException(logger, exception, httpContext.Request.Method, httpContext.Request.Path);
 
         httpContext.Response.StatusCode = statusCode;
         await httpContext.Response.WriteAsJsonAsync(response, cancellationToken);
         return true;
     }
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "Unhandled exception")]
-    private static partial void LogUnhandledException(ILogger logger, Exception exception);
+    [LoggerMessage(Level = LogLevel.Error, Message = "Unhandled exception on {Method} {Path}")]
+    private static partial void LogUnhandledException(ILogger logger, Exception exception, string method, PathString path);
 }

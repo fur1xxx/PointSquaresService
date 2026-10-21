@@ -21,12 +21,13 @@ format: ## Format code
 	dotnet csharpier format .
 
 .PHONY: run
-run: ## Start MySQL and the API in docker (rebuilds if necessary)
+run: ## Start MySQL, apply migrations and start the API in docker (rebuilds if necessary)
 	@docker compose up -d --build --wait
 
 .PHONY: dev-db
-dev-db: ## Start only MySQL in docker, to run the API from the IDE
+dev-db: ## Start only MySQL in docker and apply migrations, to run the API from the IDE
 	@docker compose -f docker-compose-dev.yml up -d --wait
+	dotnet run --project source/Migrator
 
 .PHONY: down
 down: ## Stop and remove all docker containers and their data
