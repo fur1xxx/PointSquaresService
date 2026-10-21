@@ -1,4 +1,5 @@
 using System.Globalization;
+using Persistence.Core;
 using PointSquaresService.ErrorHandling;
 using Serilog;
 
@@ -16,7 +17,8 @@ builder.Services.AddSerilog(
             .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
 );
 
-builder.Services.AddHealthChecks();
+builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddHealthChecks().AddDbContextCheck<PointSquaresDbContext>();
 builder.Services.AddOpenApi();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -27,6 +29,7 @@ var app = builder.Build();
 app.UseHealthChecks($"/{serviceUrlPrefix}/v1/health-check");
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
+app.UseRouting();
 
 if (!app.Environment.IsProduction())
 {

@@ -18,12 +18,25 @@ COPY source/Domain.Core/Domain.Core.csproj source/Domain.Core/
 COPY source/Domain.Handlers/Domain.Handlers.csproj source/Domain.Handlers/
 COPY source/Persistence.Core/Persistence.Core.csproj source/Persistence.Core/
 COPY source/PointSquaresService/PointSquaresService.csproj source/PointSquaresService/
-RUN dotnet restore source/PointSquaresService/PointSquaresService.csproj
+COPY source/Migrator/Migrator.csproj source/Migrator/
+RUN dotnet restore source/PointSquaresService/PointSquaresService.csproj && \
+    dotnet restore source/Migrator/Migrator.csproj
 
 COPY source/ source/
+
+FROM build AS publish
 RUN dotnet publish source/PointSquaresService/PointSquaresService.csproj -c $BUILD_CONFIGURATION -o /app/publish --no-restore /p:UseAppHost=false
+
+FROM build AS publish-migrator
+RUN dotnet publish source/Migrator/Migrator.csproj -c $BUILD_CONFIGURATION -o /app/publish --no-restore /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/runtime:${DOTNET_VERSION} AS migrator
+WORKDIR /app
+USER $APP_UID
+COPY --from=publish-migrator /app/publish .
+ENTRYPOINT ["dotnet", "Migrator.dll"]
 
 FROM base AS final
 USER $APP_UID
-COPY --from=build /app/publish .
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "PointSquaresService.dll"]

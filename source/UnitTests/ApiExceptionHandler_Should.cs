@@ -41,10 +41,12 @@ public class ApiExceptionHandler_Should
     [Fact]
     public async Task TryHandleAsync_BadHttpRequestException_ReturnsItsStatusWithBadRequestCode()
     {
-        var (statusCode, body) = await HandleAsync(new BadHttpRequestException("Request body is not valid JSON.", StatusCodes.Status400BadRequest));
+        var (statusCode, body) = await HandleAsync(
+            new BadHttpRequestException("Expected a supported JSON media type.", StatusCodes.Status415UnsupportedMediaType)
+        );
 
-        Assert.Equal(StatusCodes.Status400BadRequest, statusCode);
-        Assert.Equal("""{"error":"BAD_REQUEST","message":"Request body is not valid JSON."}""", body);
+        Assert.Equal(StatusCodes.Status415UnsupportedMediaType, statusCode);
+        Assert.Equal("""{"error":"BAD_REQUEST","message":"Expected a supported JSON media type."}""", body);
     }
 
     [Fact]

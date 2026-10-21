@@ -45,6 +45,9 @@ dotnet_diagnostic.IDE0005.severity = error
 dotnet_style_allow_multiple_blank_lines_experimental = false
 dotnet_diagnostic.IDE2000.severity = error
 
+[source/Persistence.Core/Migrations/*.cs]
+generated_code = true
+
 [source/*Tests/*.cs]
 dotnet_diagnostic.CA1707.severity = none
 dotnet_diagnostic.CA1711.severity = none
