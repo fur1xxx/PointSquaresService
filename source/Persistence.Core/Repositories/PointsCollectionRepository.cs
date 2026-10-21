@@ -50,4 +50,28 @@ public class PointsCollectionRepository(PointSquaresDbContext context)
                 new DateTimeOffset(c.UpdatedAt, TimeSpan.Zero)
             ))
             .SingleOrDefaultAsync(cancellationToken);
+
+    public async Task<bool> LockAsync(long id, CancellationToken cancellationToken)
+    {
+        if (context.Database.CurrentTransaction is null)
+            throw new InvalidOperationException("LockAsync must run inside a transaction, or MySQL releases the lock at once.");
+
+        await context.Database.ExecuteSqlAsync($"SET SESSION innodb_lock_wait_timeout = 10", cancellationToken);
+        var ids = await context
+            .Database.SqlQuery<long>($"SELECT id AS Value FROM points_collections WHERE id = {id} FOR UPDATE")
+            .ToListAsync(cancellationToken);
+        return ids.Count > 0;
+    }
+
+    public Task ChangeCountsAsync(long id, int pointsChange, long squaresChange, CancellationToken cancellationToken) =>
+        context.Database.ExecuteSqlAsync(
+            $"""
+            UPDATE points_collections
+            SET points_count = points_count + {pointsChange},
+                squares_count = squares_count + {squaresChange},
+                updated_at = CURRENT_TIMESTAMP(6)
+            WHERE id = {id}
+            """,
+            cancellationToken
+        );
 }

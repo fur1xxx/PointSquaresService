@@ -16,5 +16,6 @@
     <ItemGroup>
         <ProjectReference Include="..\PointSquaresService\PointSquaresService.csproj" />
         <ProjectReference Include="..\Domain.Core\Domain.Core.csproj" />
+        <ProjectReference Include="..\Persistence.Core\Persistence.Core.csproj" />
     </ItemGroup>
 </Project>
