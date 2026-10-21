@@ -28,6 +28,7 @@ services:
         condition: service_healthy
   point-squares-mysql:
     image: mysql:8.4.3
+    command: --default-time-zone=+00:00
     environment:
       MYSQL_DATABASE: point_squares
       MYSQL_ROOT_PASSWORD: "toor"

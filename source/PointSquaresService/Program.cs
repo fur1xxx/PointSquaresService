@@ -1,5 +1,6 @@
 using System.Globalization;
 using Persistence.Core;
+using PointSquaresService.Endpoints;
 using PointSquaresService.ErrorHandling;
 using Serilog;
 
@@ -30,6 +31,9 @@ app.UseHealthChecks($"/{serviceUrlPrefix}/v1/health-check");
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 app.UseRouting();
+
+var apiEndpoints = app.MapGroup($"/{serviceUrlPrefix}");
+apiEndpoints.AddPointsCollectionEndpoints();
 
 if (!app.Environment.IsProduction())
 {
