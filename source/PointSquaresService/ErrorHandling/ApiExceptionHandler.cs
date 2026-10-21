@@ -1,0 +1,30 @@
+using Common.ErrorCodes;
+using Common.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
+
+namespace PointSquaresService.ErrorHandling;
+
+public partial class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : IExceptionHandler
+{
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+    {
+        var (statusCode, response) = exception switch
+        {
+            ValidationException e => (StatusCodes.Status400BadRequest, ErrorResponse.FromException(e)),
+            NotFoundException e => (StatusCodes.Status404NotFound, ErrorResponse.FromException(e)),
+            DomainException e => (StatusCodes.Status409Conflict, ErrorResponse.FromException(e)),
+            BadHttpRequestException e => (e.StatusCode, new ErrorResponse(ResponseErrorCodes.BadRequest, e.Message)),
+            _ => (StatusCodes.Status500InternalServerError, new ErrorResponse(ResponseErrorCodes.InternalError, "An unexpected error occurred.")),
+        };
+
+        if (statusCode >= StatusCodes.Status500InternalServerError)
+            LogUnhandledException(logger, exception);
+
+        httpContext.Response.StatusCode = statusCode;
+        await httpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+        return true;
+    }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Unhandled exception")]
+    private static partial void LogUnhandledException(ILogger logger, Exception exception);
+}

@@ -1,0 +1,10 @@
+<Solution>
+    <Folder Name="/Tests/">
+        <Project Path="source/UnitTests/UnitTests.csproj" />
+    </Folder>
+    <Project Path="source/Common/Common.csproj" />
+    <Project Path="source/Domain.Core/Domain.Core.csproj" />
+    <Project Path="source/Domain.Handlers/Domain.Handlers.csproj" />
+    <Project Path="source/Persistence.Core/Persistence.Core.csproj" />
+    <Project Path="source/PointSquaresService/PointSquaresService.csproj" />
+</Solution>

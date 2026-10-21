@@ -1,0 +1,58 @@
+# Top-most EditorConfig file
+root = true
+
+# All files
+[*]
+# Indentation
+indent_style = space
+indent_size = 4
+
+# End of file
+insert_final_newline = true
+end_of_line = lf
+
+# Remove trailing whitespace
+trim_trailing_whitespace = true
+
+# Maximum line length
+max_line_length = 150
+
+# json, yaml files
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# C# files
+[*.cs]
+# Use double quotes for string literals
+csharp_prefer_double_quotes_for_strings = true
+
+# Braces
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# Spacing
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+
+# Remove unused usings
+dotnet_remove_unnecessary_usings = true
+dotnet_diagnostic.IDE0005.severity = error
+
+# Remove unnecessary line breaks
+dotnet_style_allow_multiple_blank_lines_experimental = false
+dotnet_diagnostic.IDE2000.severity = error
+
+[source/*Tests/*.cs]
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1711.severity = none
+dotnet_diagnostic.CA1716.severity = none
+dotnet_diagnostic.xUnit1051.severity = none
+
+[source/*Tests/**/*.cs]
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1711.severity = none
+dotnet_diagnostic.CA1716.severity = none
+dotnet_diagnostic.xUnit1051.severity = none

@@ -1,6 +1,0 @@
-@PointSquaresService_HostAddress = http://localhost:5073
-
-GET {{PointSquaresService_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
