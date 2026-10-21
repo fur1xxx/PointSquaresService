@@ -23,6 +23,19 @@ public class PointsRepository(PointSquaresDbContext context)
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task AddRangeAsync(long collectionId, IEnumerable<Point> points, CancellationToken cancellationToken)
+    {
+        context.Points.AddRange(
+            points.Select(point => new PointEntity
+            {
+                CollectionId = collectionId,
+                X = point.X,
+                Y = point.Y,
+            })
+        );
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<bool> RemoveAsync(long collectionId, Point point, CancellationToken cancellationToken) =>
         await context.Points.Where(p => p.CollectionId == collectionId && p.X == point.X && p.Y == point.Y).ExecuteDeleteAsync(cancellationToken) > 0;
 
@@ -38,6 +51,9 @@ public class PointsRepository(PointSquaresDbContext context)
             .ToListAsync(cancellationToken);
         return [.. column, .. row];
     }
+
+    public Task<List<Point>> GetAllAsync(long collectionId, CancellationToken cancellationToken) =>
+        context.Points.Where(p => p.CollectionId == collectionId).Select(p => new Point(p.X, p.Y)).ToListAsync(cancellationToken);
 
     public async Task<long> CountExistingAsync(long collectionId, IReadOnlyList<Point> points, CancellationToken cancellationToken)
     {

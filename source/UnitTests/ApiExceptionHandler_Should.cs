@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Common.ErrorCodes;
 using Common.Exceptions;
 using Microsoft.AspNetCore.Http;
@@ -39,14 +40,40 @@ public class ApiExceptionHandler_Should
     }
 
     [Fact]
-    public async Task TryHandleAsync_BadHttpRequestException_ReturnsItsStatusWithBadRequestCode()
+    public async Task TryHandleAsync_BadHttpRequestWithJsonException_Returns400WithPathLineAndPosition()
     {
         var (statusCode, body) = await HandleAsync(
-            new BadHttpRequestException("Expected a supported JSON media type.", StatusCodes.Status415UnsupportedMediaType)
+            new BadHttpRequestException(
+                "Failed to read parameter \"PointRequest request\" from the request body as JSON.",
+                new JsonException("The JSON value could not be converted to System.Nullable`1[System.Int32].", "$.x", 0, 8)
+            )
+        );
+
+        Assert.Equal(StatusCodes.Status400BadRequest, statusCode);
+        Assert.Equal(
+            """{"error":"BAD_REQUEST","message":"The request body is not valid JSON or has a value of the wrong type at $.x, line 1, position 9."}""",
+            body
+        );
+    }
+
+    [Fact]
+    public async Task TryHandleAsync_UnsupportedMediaType_Returns415WithOwnMessage()
+    {
+        var (statusCode, body) = await HandleAsync(
+            new BadHttpRequestException("Expected a supported JSON media type but got \"text/plain\".", StatusCodes.Status415UnsupportedMediaType)
         );
 
         Assert.Equal(StatusCodes.Status415UnsupportedMediaType, statusCode);
-        Assert.Equal("""{"error":"BAD_REQUEST","message":"Expected a supported JSON media type."}""", body);
+        Assert.Equal("""{"error":"BAD_REQUEST","message":"The request body must be JSON (Content-Type: application/json)."}""", body);
+    }
+
+    [Fact]
+    public async Task TryHandleAsync_OtherBadHttpRequest_Returns400WithOwnMessage()
+    {
+        var (statusCode, body) = await HandleAsync(new BadHttpRequestException("Failed to bind parameter \"int Limit\" from \"abc\"."));
+
+        Assert.Equal(StatusCodes.Status400BadRequest, statusCode);
+        Assert.Equal("""{"error":"BAD_REQUEST","message":"The request body is missing or a query value cannot be read."}""", body);
     }
 
     [Fact]

@@ -18,6 +18,10 @@ public static class PointEndpoints
         app.MapDelete("public/v1/collections/{id:long}/points", RemovePoint)
             .AddEndpointFilter<ValidateModel<PointRequest>>()
             .Produces<PointsCollectionResponse>();
+
+        app.MapPost("public/v1/collections/{id:long}/imports", ImportPoints)
+            .AddEndpointFilter<ValidateModel<ImportPointsRequest>>()
+            .Produces<ImportPointsResponse>();
     }
 
     private static async Task<IResult> AddPoint(
@@ -42,5 +46,18 @@ public static class PointEndpoints
         var collection = await handler.HandleAsync(id, new Point(request.X!.Value, request.Y!.Value), cancellationToken);
 
         return Results.Ok(PointsCollectionResponse.From(collection));
+    }
+
+    private static async Task<IResult> ImportPoints(
+        [FromRoute] long id,
+        [FromBody] ImportPointsRequest request,
+        [FromServices] ImportPointsHandler handler,
+        CancellationToken cancellationToken
+    )
+    {
+        var rows = ImportRowsReader.Read(request.Points);
+        var result = await handler.HandleAsync(id, rows.Points, cancellationToken);
+
+        return Results.Ok(ImportPointsResponse.From(rows, result));
     }
 }

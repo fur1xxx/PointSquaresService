@@ -1,3 +1,4 @@
+using Common.Constants;
 using Common.ErrorCodes;
 using Common.Exceptions;
 using Domain.Core;
@@ -14,8 +15,6 @@ public class AddPointHandler(
     SquaresCounter squaresCounter
 )
 {
-    private const int MaxPointsInCollection = 1_000_000;
-
     public async Task<PointsCollectionReadModel> HandleAsync(long collectionId, Point point, CancellationToken cancellationToken)
     {
         await using var transaction = await unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -28,8 +27,11 @@ public class AddPointHandler(
                 $"Point ({point.X}, {point.Y}) is already in collection {collectionId}.",
                 ResponseErrorCodes.PointAlreadyExists
             );
-        if (collection!.PointsCount >= MaxPointsInCollection)
-            throw new DomainException($"Collection {collectionId} already has {MaxPointsInCollection} points.", ResponseErrorCodes.CollectionFull);
+        if (collection!.PointsCount >= PointsCollectionConstants.MaxPointsCount)
+            throw new DomainException(
+                $"Collection {collectionId} already has {PointsCollectionConstants.MaxPointsCount} points.",
+                ResponseErrorCodes.CollectionFull
+            );
 
         var squares = await squaresCounter.CountSquaresWithCornerAsync(collectionId, point, cancellationToken);
         await pointsRepository.AddAsync(collectionId, point, cancellationToken);

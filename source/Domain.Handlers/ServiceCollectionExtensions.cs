@@ -9,6 +9,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<SquaresCounter>();
         services.AddScoped<AddPointHandler>();
         services.AddScoped<RemovePointHandler>();
+        services.AddScoped<ImportPointsHandler>();
         return services;
     }
 }
