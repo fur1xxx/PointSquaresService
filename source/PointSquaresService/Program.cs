@@ -1,4 +1,5 @@
 using System.Globalization;
+using Domain.Handlers;
 using Persistence.Core;
 using PointSquaresService.Endpoints;
 using PointSquaresService.ErrorHandling;
@@ -19,6 +20,7 @@ builder.Services.AddSerilog(
 );
 
 builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddHandlers();
 builder.Services.AddHealthChecks().AddDbContextCheck<PointSquaresDbContext>();
 builder.Services.AddOpenApi();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
@@ -34,6 +36,7 @@ app.UseRouting();
 
 var apiEndpoints = app.MapGroup($"/{serviceUrlPrefix}");
 apiEndpoints.AddPointsCollectionEndpoints();
+apiEndpoints.AddPointEndpoints();
 
 if (!app.Environment.IsProduction())
 {
